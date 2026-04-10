@@ -50,4 +50,20 @@ tl::expected<ImageSource, std::string> fromSpotImageSourceName(const std::string
  */
 std::set<ImageSource> createImageSources(const bool get_rgb_images, const bool get_depth_images,
                                          const bool get_depth_registered_images, const bool has_hand_camera);
+
+/**
+ * @brief Create a set of image sources corresponding to the specified image types and cameras.
+ * @details We represent the collection of ImageSources as a std::set to clearly communicate the requirement that we
+ * must only send one request to Spot for a given combination of camera type and image type.
+ *
+ * @param get_rgb_images Sets whether to request RGB images.
+ * @param get_depth_images Sets whether to request depth images.
+ * @param get_depth_registered_images Sets whether to request registered depth images.
+ * @param has_hand_camera Sets whether to request images from the hand camera.
+ * @param cameras_used Sets which cameras to request images from.
+ * @return A set of ImageSources which represents all requested image and camera types.
+ */
+std::set<ImageSource> createImageSources(const bool get_rgb_images, const bool get_depth_images,
+                                         const bool get_depth_registered_images, const bool has_hand_camera,
+                                         const std::vector<std::string>& cameras_used);
 }  // namespace spot_ros2

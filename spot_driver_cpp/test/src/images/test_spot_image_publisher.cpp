@@ -14,6 +14,7 @@
 #include <memory>
 #include <optional>
 #include <tl_expected/expected.hpp>
+#include <vector>
 
 using ::testing::_;
 using ::testing::AllOf;
@@ -49,6 +50,8 @@ class FakeParameterInterface : public ParameterInterfaceBase {
 
   bool getPublishDepthRegisteredImages() const override { return publish_depth_registered_images; }
 
+  std::vector<std::string> getCamerasUsed() const override { return cameras_used; }
+
   std::string getSpotName() const override { return spot_name; }
 
   double rgb_image_quality = kDefaultRGBImageQuality;
@@ -56,6 +59,7 @@ class FakeParameterInterface : public ParameterInterfaceBase {
   bool publish_rgb_images = kDefaultPublishRGBImages;
   bool publish_depth_images = kDefaultPublishDepthImages;
   bool publish_depth_registered_images = kDefaultPublishDepthRegisteredImages;
+  std::vector<std::string> cameras_used = {"frontleft", "frontright", "left", "right", "back", "hand"};
   std::string spot_name;
 };
 

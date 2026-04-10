@@ -9,8 +9,10 @@
 #include <spot_driver_cpp/rclcpp_test.hpp>
 
 #include <memory>
+#include <vector>
 
 namespace {
+using ::testing::ElementsAre;
 using ::testing::Eq;
 using ::testing::IsEmpty;
 using ::testing::IsTrue;
@@ -158,6 +160,8 @@ TEST_F(RclcppParameterInterfaceEnvVarTest, GetSpotConfigFromParameters) {
   node_->declare_parameter("publish_depth", publish_depth_images_parameter);
   constexpr auto publish_depth_registered_images_parameter = false;
   node_->declare_parameter("publish_depth_registered", publish_depth_registered_images_parameter);
+  const std::vector<std::string> cameras_used_parameter = {"frontleft"};
+  node_->declare_parameter("cameras_used", cameras_used_parameter);
 
   // GIVEN we create a RclcppParameterInterface using the node
   RclcppParameterInterface parameter_interface{node_};
@@ -172,6 +176,7 @@ TEST_F(RclcppParameterInterfaceEnvVarTest, GetSpotConfigFromParameters) {
   EXPECT_THAT(parameter_interface.getPublishRGBImages(), Eq(publish_rgb_images_parameter));
   EXPECT_THAT(parameter_interface.getPublishDepthImages(), Eq(publish_depth_images_parameter));
   EXPECT_THAT(parameter_interface.getPublishDepthRegisteredImages(), Eq(publish_depth_registered_images_parameter));
+  EXPECT_THAT(parameter_interface.getCamerasUsed(), Eq(cameras_used_parameter));
 }
 
 TEST_F(RclcppParameterInterfaceEnvVarTest, GetSpotConfigEnvVarsOverruleParameters) {
@@ -217,5 +222,7 @@ TEST_F(RclcppParameterInterfaceEnvVarTest, GetConfigDefaults) {
   EXPECT_THAT(parameter_interface.getPublishRGBImages(), IsTrue());
   EXPECT_THAT(parameter_interface.getPublishDepthImages(), IsTrue());
   EXPECT_THAT(parameter_interface.getPublishDepthRegisteredImages(), IsTrue());
+  EXPECT_THAT(parameter_interface.getCamerasUsed(),
+              ElementsAre("frontleft", "frontright", "left", "right", "back", "hand"));
 }
 }  // namespace spot_ros2::test

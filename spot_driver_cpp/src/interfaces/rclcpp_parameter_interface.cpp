@@ -3,6 +3,7 @@
 #include <spot_driver_cpp/interfaces/rclcpp_parameter_interface.hpp>
 
 #include <cstdlib>
+#include <vector>
 
 namespace {
 constexpr auto kEnvVarNameAddress = "SPOT_IP";
@@ -17,6 +18,8 @@ constexpr auto kParameterNameHasRGBCameras = "rgb_cameras";
 constexpr auto kParameterNamePublishRGBImages = "publish_rgb";
 constexpr auto kParameterNamePublishDepthImages = "publish_depth";
 constexpr auto kParameterNamePublishDepthRegisteredImages = "publish_depth_registered";
+constexpr auto kParameterNameCamerasUsed = "cameras_used";
+const std::vector<std::string> kDefaultCamerasUsed = {"frontleft", "frontright", "left", "right", "back", "hand"};
 
 /**
  * @brief Get a rclcpp parameter. If the parameter has not been declared, declare it with the provided default value and
@@ -108,6 +111,10 @@ bool RclcppParameterInterface::getPublishDepthImages() const {
 bool RclcppParameterInterface::getPublishDepthRegisteredImages() const {
   return declareAndGetParameter<bool>(node_, kParameterNamePublishDepthRegisteredImages,
                                       kDefaultPublishDepthRegisteredImages);
+}
+
+std::vector<std::string> RclcppParameterInterface::getCamerasUsed() const {
+  return declareAndGetParameter<std::vector<std::string>>(node_, kParameterNameCamerasUsed, kDefaultCamerasUsed);
 }
 
 std::string RclcppParameterInterface::getSpotName() const {

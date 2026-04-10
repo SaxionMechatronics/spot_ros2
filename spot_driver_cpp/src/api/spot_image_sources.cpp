@@ -40,6 +40,14 @@ static const std::unordered_map<spot_ros2::SpotCamera, std::string> kSpotCameraT
 };
 
 /**
+ * @brief Map from each ROS camera topic name string to the corresponding SpotCamera value.
+ */
+static const std::unordered_map<std::string, spot_ros2::SpotCamera> kRosStringToSpotCamera{
+    {"back", SpotCamera::BACK}, {"frontleft", SpotCamera::FRONTLEFT}, {"frontright", SpotCamera::FRONTRIGHT},
+    {"hand", SpotCamera::HAND}, {"left", SpotCamera::LEFT},           {"right", SpotCamera::RIGHT},
+};
+
+/**
  * @brief Map from each ImageSource permutation to the corresponding fully-qualified source name used by the Spot API.
  */
 static const std::map<ImageSource, std::string> kImageSourceToAPISourceName = []() {
@@ -99,29 +107,49 @@ tl::expected<ImageSource, std::string> fromSpotImageSourceName(const std::string
 
 std::set<ImageSource> createImageSources(const bool get_rgb_images, const bool get_depth_images,
                                          const bool get_depth_registered_images, const bool has_hand_camera) {
+  std::vector<std::string> cameras_used;
+  for (const auto& camera : kAllSpotBodyCameras) {
+    cameras_used.push_back(kSpotCameraToRosString.at(camera));
+  }
+  if (has_hand_camera) {
+    cameras_used.push_back(kSpotCameraToRosString.at(SpotCamera::HAND));
+  }
+  return createImageSources(get_rgb_images, get_depth_images, get_depth_registered_images, has_hand_camera,
+                            cameras_used);
+}
+
+std::set<ImageSource> createImageSources(const bool get_rgb_images, const bool get_depth_images,
+                                         const bool get_depth_registered_images, const bool has_hand_camera,
+                                         const std::vector<std::string>& cameras_used) {
   std::set<ImageSource> sources;
-  if (get_rgb_images) {
-    for (const auto& camera : kAllSpotBodyCameras) {
-      sources.insert(ImageSource{camera, SpotImageType::RGB});
+  std::vector<SpotCamera> cameras;
+
+  for (const auto& camera_name : cameras_used) {
+    const auto camera = kRosStringToSpotCamera.find(camera_name);
+    if (camera == kRosStringToSpotCamera.end()) {
+      throw std::invalid_argument("Invalid camera name `" + camera_name +
+                                  "` in `cameras_used`. Expected one of [back, frontleft, frontright, hand, left, "
+                                  "right].");
     }
-    if (has_hand_camera) {
-      sources.insert(ImageSource{SpotCamera::HAND, SpotImageType::RGB});
+    if (camera->second == SpotCamera::HAND && !has_hand_camera) {
+      continue;
+    }
+    cameras.push_back(camera->second);
+  }
+
+  if (get_rgb_images) {
+    for (const auto& camera : cameras) {
+      sources.insert(ImageSource{camera, SpotImageType::RGB});
     }
   }
   if (get_depth_images) {
-    for (const auto& camera : kAllSpotBodyCameras) {
+    for (const auto& camera : cameras) {
       sources.insert(ImageSource{camera, SpotImageType::DEPTH});
-    }
-    if (has_hand_camera) {
-      sources.insert(ImageSource{SpotCamera::HAND, SpotImageType::DEPTH});
     }
   }
   if (get_depth_registered_images) {
-    for (const auto& camera : kAllSpotBodyCameras) {
+    for (const auto& camera : cameras) {
       sources.insert(ImageSource{camera, SpotImageType::DEPTH_REGISTERED});
-    }
-    if (has_hand_camera) {
-      sources.insert(ImageSource{SpotCamera::HAND, SpotImageType::DEPTH_REGISTERED});
     }
   }
 

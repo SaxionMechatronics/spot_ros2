@@ -233,5 +233,19 @@ TEST(SpotImageSources, createImageSources) {
           ImageSource{SpotCamera::LEFT, SpotImageType::DEPTH_REGISTERED},
           ImageSource{SpotCamera::RIGHT, SpotImageType::DEPTH_REGISTERED},
           ImageSource{SpotCamera::HAND, SpotImageType::DEPTH_REGISTERED}));
+
+  // WHEN RGB images are requested from only the front-left camera
+  // THEN only the front-left RGB image source is returned
+  EXPECT_THAT(createImageSources(true, false, false, false, {"frontleft"}),
+              UnorderedElementsAre(ImageSource{SpotCamera::FRONTLEFT, SpotImageType::RGB}));
+
+  // WHEN the hand camera is requested but the robot does not have a hand camera
+  // THEN the hand camera image source is not returned
+  EXPECT_THAT(createImageSources(true, false, false, false, {"hand"}), IsEmpty());
+
+  // WHEN the hand camera is requested and the robot has a hand camera
+  // THEN the hand RGB image source is returned
+  EXPECT_THAT(createImageSources(true, false, false, true, {"hand"}),
+              UnorderedElementsAre(ImageSource{SpotCamera::HAND, SpotImageType::RGB}));
 }
 }  // namespace spot_ros2::images::test

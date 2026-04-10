@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace spot_ros2 {
 /**
@@ -27,6 +28,7 @@ class RclcppParameterInterface : public ParameterInterfaceBase {
   bool getPublishRGBImages() const override;
   bool getPublishDepthImages() const override;
   bool getPublishDepthRegisteredImages() const override;
+  std::vector<std::string> getCamerasUsed() const override;
   std::string getSpotName() const override;
 
  private:

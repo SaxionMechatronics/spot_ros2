@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace spot_ros2 {
 /**
@@ -24,6 +25,7 @@ class ParameterInterfaceBase {
   virtual bool getPublishRGBImages() const = 0;
   virtual bool getPublishDepthImages() const = 0;
   virtual bool getPublishDepthRegisteredImages() const = 0;
+  virtual std::vector<std::string> getCamerasUsed() const = 0;
   virtual std::string getSpotName() const = 0;
 
  protected:

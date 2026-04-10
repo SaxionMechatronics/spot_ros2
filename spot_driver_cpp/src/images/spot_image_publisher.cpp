@@ -74,10 +74,11 @@ bool SpotImagePublisher::initialize() {
   const auto publish_depth_registered_images =
       middleware_handle_->parameter_interface()->getPublishDepthRegisteredImages();
   const auto has_rgb_cameras = middleware_handle_->parameter_interface()->getHasRGBCameras();
+  const auto cameras_used = middleware_handle_->parameter_interface()->getCamerasUsed();
 
   // Generate the set of image sources based on which cameras the user has requested that we publish
-  const auto sources =
-      createImageSources(publish_rgb_images, publish_depth_images, publish_depth_registered_images, has_arm_);
+  const auto sources = createImageSources(publish_rgb_images, publish_depth_images, publish_depth_registered_images,
+                                          has_arm_, cameras_used);
 
   // Generate the image request message to capture the data from the specified image sources
   image_request_message_ = createImageRequest(sources, has_rgb_cameras, rgb_image_quality, false);
