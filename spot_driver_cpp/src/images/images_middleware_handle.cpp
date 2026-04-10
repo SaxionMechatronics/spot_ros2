@@ -39,14 +39,17 @@ void ImagesMiddlewareHandle::createPublishers(const std::set<ImageSource>& image
 
     const auto image_topic_name = topic_name_base + "/" + kImageTopicSuffix;
 
+    auto qos = rclcpp::QoS(rclcpp::KeepLast(kPublisherHistoryDepth));
+    qos.best_effort();
+    
     image_publishers_.try_emplace(image_topic_name,
                                   node_->create_publisher<sensor_msgs::msg::Image>(
-                                      image_topic_name, rclcpp::QoS(rclcpp::KeepLast(kPublisherHistoryDepth))));
+                                      image_topic_name, qos));
 
     const auto info_topic_name = topic_name_base + "/" + kCameraInfoTopicSuffix;
     info_publishers_.try_emplace(info_topic_name,
                                  node_->create_publisher<sensor_msgs::msg::CameraInfo>(
-                                     info_topic_name, rclcpp::QoS(rclcpp::KeepLast(kPublisherHistoryDepth))));
+                                     info_topic_name, qos));
   }
 }
 
