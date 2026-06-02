@@ -32,6 +32,7 @@ git clone https://github.com/bdaiinstitute/spot_ros2.git
 and initialize and install the submodules
 ```bash
 cd spot_ros2
+pip install inflection # extra dependency
 git submodule init
 git submodule update
 ```
