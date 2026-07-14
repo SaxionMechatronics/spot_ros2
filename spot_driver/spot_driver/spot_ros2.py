@@ -738,6 +738,15 @@ class SpotROS(Node):
             self.handle_graph_nav_get_localization_pose,
             callback_group=self.group,
         )
+        
+        self.create_service(
+            SetBool,
+            "disable_body_obstacle_avoidance",
+            lambda request, response: self.service_wrapper(
+                "disable_body_obstacle_avoidance",
+                self.handle_disable_body_obstacle_avoidance, request, response),
+            callback_group=self.group,
+        )
 
         self.create_service(
             GraphNavSetLocalization,
@@ -2382,6 +2391,23 @@ class SpotROS(Node):
             response.message = error_str
 
         return response
+    
+    def handle_disable_body_obstacle_avoidance(self, request, response):
+        if self.spot_wrapper is None:
+            response.success = False
+            response.message = "Spot wrapper is undefined"
+            return response
+        try:
+            mobility_params = self.spot_wrapper.get_mobility_params()
+            mobility_params.obstacle_params.disable_vision_body_obstacle_avoidance = request.data
+            self.spot_wrapper.set_mobility_params(mobility_params)
+            response.success = True
+            response.message = "Success"
+            return response
+        except Exception as e:
+            response.success = False
+            response.message = "Error:{}".format(e)
+            return response
 
     def populate_camera_static_transforms(self, image_data: image_pb2.Image) -> None:
         """Check data received from one of the image tasks and use the transform snapshot to extract the camera frame
