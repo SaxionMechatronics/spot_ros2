@@ -40,7 +40,7 @@ void ImagesMiddlewareHandle::createPublishers(const std::set<ImageSource>& image
     const auto image_topic_name = topic_name_base + "/" + kImageTopicSuffix;
 
     auto qos = rclcpp::QoS(rclcpp::KeepLast(kPublisherHistoryDepth));
-    qos.best_effort();
+    qos.reliable();
     
     image_publishers_.try_emplace(image_topic_name,
                                   node_->create_publisher<sensor_msgs::msg::Image>(
